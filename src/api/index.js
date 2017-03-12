@@ -8,6 +8,8 @@ AV.init({ appId, appKey })
 let Comment = AV.Object.extend('Comments')
 let Mark = AV.Object.extend('Marks')
 
+let currentUser = AV.User.current()
+
 export default {
   user: {
     login (username, password) {
@@ -23,16 +25,16 @@ export default {
       // 设置邮箱
       // user.setEmail('tom@leancloud.cn')
       return user.signUp()
+    },
+    baseinfo () {
+      return currentUser.getUsername()
     }
   },
   comment: {
-    get (text, url) {
-      let queryUrl = new AV.Query('Comments')
-      let queryText = new AV.Query('Comments')
-      queryUrl.equalTo('url', url)
-      queryText.equalTo('text', text)
-      let query = AV.Query.and(queryUrl, queryText)
-      return query.find()
+    get () {
+      let queryComment = new AV.Query('Comments')
+      queryComment.equalTo('user', currentUser.id)
+      return queryComment.find()
     },
 
     add (serialize, text, url, comment) {
